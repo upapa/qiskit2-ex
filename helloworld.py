@@ -18,17 +18,28 @@ qc.cx(0, 1)
 # If you're running this in a script, use `print(qc.draw())` to
 # print a text drawing.
 # qc.draw("mpl").show()
+print(qc.draw())
 
 
 # Set up six different observables.
 observables_labels = ["IZ", "IX", "ZI", "XI", "ZZ", "XX"]
 observables = [SparsePauliOp(label) for label in observables_labels]
 
- 
+
+# from qiskit_ibm_runtime import QiskitRuntimeService
+# service = QiskitRuntimeService()
+# backend = service.least_busy(simulator=False, operational=True)
+# # Convert to an ISA circuit and layout-mapped observables.
+# pm = generate_preset_pass_manager(backend=backend, optimization_level=1)
+# isa_circuit = pm.run(qc)
+# isa_circuit.draw("mpl", idle_wires=False) 
+
+
+
 # Use the following code instead if you want to run on a simulator:
  
-from qiskit_ibm_runtime.fake_provider import FakeFez
-backend = FakeFez()
+from qiskit_ibm_runtime.fake_provider import FakeManilaV2
+backend = FakeManilaV2()
 estimator = Estimator(backend)
  
 # Convert to an ISA circuit and layout-mapped observables.
@@ -39,12 +50,12 @@ mapped_observables = [
 ]
  
 job = estimator.run([(isa_circuit, mapped_observables)])
-result = job.result()
+# result = job.result()
  
 # This is the result of the entire submission.  You submitted one Pub,
 # so this contains one inner result (and some metadata of its own).
  
-job_result = job.result()
+# job_result = job.result()
  
 # This is the result from our single pub, which had five observables,
 # so contains information on all five.
