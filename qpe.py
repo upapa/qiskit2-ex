@@ -49,7 +49,7 @@ for n in range(3):
 # version 2.1.2
 from qiskit.transpiler import generate_preset_pass_manager
 from qiskit_ibm_runtime import EstimatorV2 as Estimator
-from qiskit_ibm_runtime import SamplerV2 as Sampler
+from qiskit_ibm_runtime import Session, SamplerV2 as Sampler
 from qiskit_ibm_runtime.fake_provider import FakeManilaV2
 backend = FakeManilaV2()
 
@@ -58,17 +58,26 @@ backend = FakeManilaV2()
 # pm = generate_preset_pass_manager(backend=backend, optimization_level=1)
 # isa_circuit = pm.run(qpe)
 # mapped_observables = []
- 
 # # estimator = Estimator(backend)
 # # job = estimator.run([(isa_circuit, mapped_observables)])
 # # answer = job.result()[0]
 
-from qiskit import transpile
-sampler = Sampler(backend)
-transpiled_circuit = transpile(qpe, backend)
-job = sampler.run([transpiled_circuit])
-pub_result = job.result()[0]
-answer = pub_result.data.meas.get_counts()  # data에 meas 필드가 없다. 실행에 실패한걸까?
-
-print(answer)
-plot_distribution(answer)
+# from qiskit import transpile
+options = {"simulator": {"seed_simulator": 42}}
+# transpiled_circuit = transpile(qpe, backend)
+# job = sampler.run([transpiled_circuit])
+pm = generate_preset_pass_manager(optimization_level=1, backend=backend)
+isa_qpe = pm.run(qpe)
+# sampler = Sampler(mode=backend,options=options)
+# job = sampler.run([isa_qpe]) 
+# pub_result = job.result()[0]
+# answer = pub_result.data.meas.get_counts()  # data에 meas 필드가 없다. 실행에 실패한걸까?
+from qiskit_aer import AerSimulator
+aer_sim = AerSimulator()
+sampler = Sampler(mode=aer_sim)
+job = sampler.run([isa_qpe])
+pub_result = job.result()
+print(pub_result)
+# answer = pub_result.data.meas.get_counts()
+# print(answer)
+# plot_distribution(answer)
