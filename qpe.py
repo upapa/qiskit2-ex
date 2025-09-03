@@ -11,7 +11,7 @@ import math
 from qiskit import QuantumCircuit, ClassicalRegister, QuantumRegister
 
 # import basic plot tools and circuits
-from qiskit.visualization import plot_histogram
+from qiskit.visualization import plot_histogram, plot_distribution
 from qiskit.circuit.library import QFT
 
 qpe = QuantumCircuit(4, 3)
@@ -49,9 +49,26 @@ for n in range(3):
 # version 2.1.2
 from qiskit.transpiler import generate_preset_pass_manager
 from qiskit_ibm_runtime import EstimatorV2 as Estimator
+from qiskit_ibm_runtime import SamplerV2 as Sampler
 from qiskit_ibm_runtime.fake_provider import FakeManilaV2
 backend = FakeManilaV2()
-estimator = Estimator(backend)
 
 
-plot_histogram(answer)
+# # Convert to an ISA circuit and layout-mapped observables.
+# pm = generate_preset_pass_manager(backend=backend, optimization_level=1)
+# isa_circuit = pm.run(qpe)
+# mapped_observables = []
+ 
+# # estimator = Estimator(backend)
+# # job = estimator.run([(isa_circuit, mapped_observables)])
+# # answer = job.result()[0]
+
+from qiskit import transpile
+sampler = Sampler(backend)
+transpiled_circuit = transpile(qpe, backend)
+job = sampler.run([transpiled_circuit])
+pub_result = job.result()[0]
+answer = pub_result.data.meas.get_counts()  # data에 meas 필드가 없다. 실행에 실패한걸까?
+
+print(answer)
+plot_distribution(answer)
