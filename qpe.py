@@ -12,29 +12,34 @@ from qiskit import QuantumCircuit, ClassicalRegister, QuantumRegister
 
 # import basic plot tools and circuits
 from qiskit.visualization import plot_histogram, plot_distribution
-from qiskit.circuit.library import QFT
+from qiskit.circuit.library import QFT, QFTGate
 
-qpe = QuantumCircuit(4, 3)
-qpe.x(3)
+num_qubits = 5
+qpe = QuantumCircuit(num_qubits+1, num_qubits)
+qpe.x(num_qubits)
 # print(qpe.draw())
 
-for qubit in range(3):
+for qubit in range(num_qubits):
     qpe.h(qubit)
 # print(qpe.draw())
 
+angle = 2*math.pi/3 
 repetitions = 1
-for counting_qubit in range(3):
+for counting_qubit in range(num_qubits):
     for i in range(repetitions):
-        qpe.cp(math.pi/4, counting_qubit, 3); # controlled-T
+        qpe.cp(angle, counting_qubit, num_qubits); # controlled-T
     repetitions *= 2
 # print(qpe.draw())
 
 qpe.barrier()
 # Apply inverse QFT
-qpe = qpe.compose(QFT(3, inverse=True), [0,1,2])
+# qpe = qpe.compose(QFT(3, inverse=True), [0,1,2])
+
+from qiskit.synthesis.qft import synth_qft_full
+qpe = qpe.compose(synth_qft_full(num_qubits, inverse=True), range(num_qubits))
 # Measure
 qpe.barrier()
-for n in range(3):
+for n in range(num_qubits):
     qpe.measure(n,n)
 
 # print(qpe.draw())
@@ -50,8 +55,10 @@ for n in range(3):
 from qiskit.transpiler import generate_preset_pass_manager
 from qiskit_ibm_runtime import EstimatorV2 as Estimator
 from qiskit_ibm_runtime import Session, SamplerV2 as Sampler
-from qiskit_ibm_runtime.fake_provider import FakeManilaV2
-backend = FakeManilaV2()
+# fake backend는 종류에 따라서 qubit 최대 수의 제한이 있음
+# ref: https://quantum.cloud.ibm.com/docs/en/api/qiskit-ibm-runtime/fake-provider
+from qiskit_ibm_runtime.fake_provider import FakeManilaV2, FakeFez, FakeGuadalupeV2
+backend = FakeGuadalupeV2()
 
 
 # # Convert to an ISA circuit and layout-mapped observables.
@@ -70,7 +77,7 @@ pm = generate_preset_pass_manager(optimization_level=1, backend=backend)
 isa_qpe = pm.run(qpe)
 
 sampler = Sampler(mode=backend)
-job = sampler.run([isa_qpe]) 
+job = sampler.run([isa_qpe], shots=4096) 
 pub_result = job.result()[0]
 
 
