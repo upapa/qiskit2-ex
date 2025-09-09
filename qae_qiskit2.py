@@ -53,3 +53,25 @@ iae = IterativeAmplitudeEstimation(
 iae_result = iae.estimate(problem)
 
 print("Estimate:", iae_result.estimation)
+
+
+from qiskit_algorithms import MaximumLikelihoodAmplitudeEstimation
+
+mlae = MaximumLikelihoodAmplitudeEstimation(
+    evaluation_schedule=3,  # log2 of the maximal Grover power
+    sampler=sampler,
+)
+mlae_result = mlae.estimate(problem)
+
+print("Estimate:", mlae_result.estimation)
+
+from qiskit_algorithms import FasterAmplitudeEstimation
+
+fae = FasterAmplitudeEstimation(
+    delta=0.01,  # target accuracy
+    maxiter=3,  # determines the maximal power of the Grover operator
+    sampler=sampler,
+)
+fae_result = fae.estimate(problem)
+
+print("Estimate:", fae_result.estimation)
