@@ -14,8 +14,8 @@ from qiskit import QuantumCircuit, ClassicalRegister, QuantumRegister
 from qiskit.visualization import plot_histogram, plot_distribution
 from qiskit.circuit.library import QFT, QFTGate
 
-num_qubits = 5
-qpe = QuantumCircuit(num_qubits+1, num_qubits)
+num_qubits = 15
+qpe = QuantumCircuit(num_qubits+1, num_qubits)  # 1arg: num of qubits, 2arg: num of classical bits(measuring) 
 qpe.x(num_qubits)
 # print(qpe.draw())
 
@@ -57,9 +57,11 @@ from qiskit_ibm_runtime import EstimatorV2 as Estimator
 from qiskit_ibm_runtime import Session, SamplerV2 as Sampler
 # fake backend는 종류에 따라서 qubit 최대 수의 제한이 있음
 # ref: https://quantum.cloud.ibm.com/docs/en/api/qiskit-ibm-runtime/fake-provider
-from qiskit_ibm_runtime.fake_provider import FakeManilaV2, FakeFez, FakeGuadalupeV2
-backend = FakeGuadalupeV2()
-
+from qiskit_ibm_runtime.fake_provider import FakeManilaV2, FakeFez, FakeGuadalupeV2, FakeSherbrooke
+backend = FakeGuadalupeV2()  # 16 qubits
+# backend = FakeManilaV2  # 5 qubits
+# backend = FakeFez  # 156 qubits
+# backend = FakeSherbrooke # 126 qubits
 
 # # Convert to an ISA circuit and layout-mapped observables.
 # pm = generate_preset_pass_manager(backend=backend, optimization_level=1)
