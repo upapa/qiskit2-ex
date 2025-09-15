@@ -44,13 +44,6 @@ for n in range(num_qubits):
 
 # print(qpe.draw())
 
-# # back end: version2에서 많이 수정된 부분
-# aer_sim = Aer.get_backend('aer_simulator')
-# shots = 2048
-# t_qpe = transpile(qpe, aer_sim)
-# results = aer_sim.run(t_qpe, shots=shots).result()
-# answer = results.get_counts()
-
 # version 2.1.2
 from qiskit.transpiler import generate_preset_pass_manager
 from qiskit_ibm_runtime import EstimatorV2 as Estimator
@@ -63,23 +56,15 @@ backend = FakeGuadalupeV2()  # 16 qubits
 # backend = FakeFez  # 156 qubits
 # backend = FakeSherbrooke # 126 qubits
 
-# # Convert to an ISA circuit and layout-mapped observables.
-# pm = generate_preset_pass_manager(backend=backend, optimization_level=1)
-# isa_circuit = pm.run(qpe)
-# mapped_observables = []
-# # estimator = Estimator(backend)
-# # job = estimator.run([(isa_circuit, mapped_observables)])
-# # answer = job.result()[0]
-
-# from qiskit import transpile
 options = {"simulator": {"seed_simulator": 42}}
-# transpiled_circuit = transpile(qpe, backend)
-# job = sampler.run([transpiled_circuit])
 pm = generate_preset_pass_manager(optimization_level=1, backend=backend)
 isa_qpe = pm.run(qpe)
-
 sampler = Sampler(mode=backend)
 job = sampler.run([isa_qpe], shots=4096) 
+
+
+
+
 pub_result = job.result()[0]
 
 
