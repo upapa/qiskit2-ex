@@ -1,0 +1,8 @@
+qiskit
+qiskit-ibm-runtime
+qiskit[visualization]
+qiskit-aer
+qiskit-algorithms
+qiskit-finance
+qiskit-optimization
+matplotlib
